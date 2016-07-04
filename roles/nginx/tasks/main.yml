@@ -1,0 +1,8 @@
+ks file for nginx
+   - name: Install NGINX.
+     yum: name=nginx
+   - command: chkconfig nginx on
+   - command: service nginx restart
+#httpd uninstal
+#   - yum: name=httpd state=absent
+#   - yum: name=httpd-tools state=absent

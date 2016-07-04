@@ -1,0 +1,42 @@
+---
+# tasks file for php
+  - name: Install PHP
+    yum: name={{ item }} state=present enablerepo=epel
+    with_items:
+        - php
+        - php-pgsql
+        - php-devel
+        - php-mbstring
+        - php-gd
+        - php-fpm
+        - php-pecl-apc
+#php setting
+  - lineinfile: dest=/etc/php.ini
+          regexp=';date.timezone ='
+          line='date.timezone = Asia/Tokyo'
+  - lineinfile: dest=/etc/php.ini
+          regexp='session.gc_maxlifetime ='
+          line='session.gc_maxlifetime = 1800'
+  - lineinfile: dest=/etc/php.ini
+          regexp='memory_limit ='
+          line='memory_limit = 256M'
+#php-fpm setting
+  - lineinfile: "dest=/etc/php-fpm.d/www.conf
+          state=present
+          regexp='^user = apache'
+          line='user = nginx'"
+  - lineinfile: "dest=/etc/php-fpm.d/www.conf
+          state=present
+          regexp='^group = apache'
+          line='group = nginx'"
+  - command: chkconfig php-fpm on
+  - command: service php-fpm restart
+  - command: chown nginx /var/lib/php/session
+  - command: chgrp nginx /var/lib/php/session
+#apc setting
+  - lineinfile: dest=/etc/php.d/apc.ini
+          regexp='apc.mmap_file_mask='
+          line='apc.mmap_file_mask=/dev/zero'
+  - lineinfile: dest=/etc/php.d/apc.ini
+          regexp='apc.shm_size='
+          line='apc.shm_size=128M'
